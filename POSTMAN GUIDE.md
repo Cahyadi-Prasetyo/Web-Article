@@ -1,19 +1,4 @@
-# Postman Troubleshooting Guide
-
-## Masalah yang Sudah Diperbaiki
-
-### 1. **User Model - Missing HasApiTokens Trait**
-- **Masalah**: Error `Call to undefined method App\Models\User::createToken()`
-- **Solusi**: Menambahkan `use Laravel\Sanctum\HasApiTokens;` di User model
-
-### 2. **ArticleController - Error Handling**
-- **Masalah**: Error 500 tanpa pesan yang jelas
-- **Solusi**: Menambahkan try-catch blocks di semua method
-
-### 3. **Response Format Consistency**
-- **Masalah**: Response format tidak konsisten
-- **Solusi**: Standardisasi response format dengan `message` dan `data`
-
+# Postman Guide
 ## Cara Testing dengan Postman
 
 ### 1. **Pastikan Server Berjalan**
