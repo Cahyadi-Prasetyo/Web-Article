@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login | Artikel Komunis</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -48,7 +49,11 @@
                 Silakan login untuk mengakses artikel eksklusif.
             </p>
 
-            <form>
+            <!-- Error Message -->
+            <div id="error-message" class="hidden mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            </div>
+
+            <form id="login-form">
 
                 <div class="mb-5">
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
@@ -57,6 +62,7 @@
                     <input
                         type="email"
                         id="email"
+                        name="email"
                         placeholder="nama.pengguna@domain.com"
                         required
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-gray-900
@@ -71,6 +77,7 @@
                     <input
                         type="password"
                         id="password"
+                        name="password"
                         placeholder="Minimal 8 karakter"
                         required
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-gray-900
@@ -80,6 +87,7 @@
 
                 <button
                     type="submit"
+                    id="login-btn"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-lg 
                            shadow-lg shadow-blue-500/50 transition duration-300 transform hover:scale-[1.01]">
                     Login
@@ -107,6 +115,72 @@
             <p>&copy; 2025 Situs Komunis. Semua Hak Cipta Dilindungi.</p>
         </div>
     </footer>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('error-message');
+            const loginBtn = document.getElementById('login-btn');
+            
+            // Reset error
+            errorDiv.classList.add('hidden');
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Loading...';
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Simpan token dan user data
+                    localStorage.setItem('auth_token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Clear welcome toast flag untuk session baru
+                    sessionStorage.removeItem('admin_welcome_shown');
+                    sessionStorage.removeItem('user_welcome_shown');
+                    
+                    // Show success toast
+                    errorDiv.classList.add('hidden');
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm';
+                    successDiv.textContent = '✅ Login berhasil! Mengalihkan...';
+                    document.getElementById('login-form').insertBefore(successDiv, document.getElementById('login-form').firstChild);
+                    
+                    // Redirect berdasarkan role
+                    setTimeout(() => {
+                        if (data.user.role === 'admin') {
+                            window.location.href = '/admin/dashboard';
+                        } else {
+                            window.location.href = '/user/dashboard';
+                        }
+                    }, 1000);
+                } else {
+                    // Tampilkan error
+                    errorDiv.textContent = data.message || 'Email atau password salah';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Terjadi kesalahan. Silakan coba lagi.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }
+        });
+    </script>
 
 </body>
 

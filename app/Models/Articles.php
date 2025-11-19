@@ -22,6 +22,7 @@ class Articles extends Model
         'status',
         'published_at',
         'author_id',
+        'rejection_reason',
     ];
 
     protected $casts = [

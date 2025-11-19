@@ -18,9 +18,10 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('content');
             $table->string('excerpt');
-            $table->enum('status', ['draft', 'published', 'archived']);
-            $table->dateTime('published_at');
+            $table->enum('status', ['draft', 'pending', 'published', 'rejected', 'archived'])->default('draft');
+            $table->dateTime('published_at')->nullable();
             $table->unsignedBigInteger('author_id');
+            $table->text('rejection_reason')->nullable();
             $table->timestamps();
 
             $table->foreign('author_id')->references('id')->on('users')->onDelete('cascade');
