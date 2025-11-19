@@ -17,3 +17,7 @@ Route::get('/login', function () {
 Route::get('/register', function () {
     return view('login.register');
 })->name('register');
+
+Route::get('/lihat-artikel', function () {
+    return view('lihat');
+})->name('lihat');
