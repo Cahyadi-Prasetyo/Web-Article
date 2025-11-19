@@ -135,6 +135,11 @@ class ArticleController extends Controller
                 ], 404);
             }
 
+            // check role
+            if ($request->user()->role !== 'admin' && $request->user()->id !== $article->author_id){
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+
             $request->validate([
                 'title' => 'sometimes|required|string|max:255',
                 'categories' => 'sometimes|required|string',
@@ -182,9 +187,9 @@ class ArticleController extends Controller
     }
 
     /**
-     * Remove the specified article (admin only)
+     * Remove the specified article (admin can delete all, user only own)
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         try {
             $article = Articles::find($id);
@@ -193,6 +198,11 @@ class ArticleController extends Controller
                 return response()->json([
                     'message' => 'Article not found'
                 ], 404);
+            }
+
+            // check role
+            if ($request->user()->role !== 'admin' && $request->user()->id !== $article->author_id) {
+                return response()->json(['message' => 'Unauthorized'], 403);
             }
 
             $article->delete();
