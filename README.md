@@ -1,4 +1,4 @@
-# � Arbticle Management System
+# � Article Management System
 
 Platform manajemen artikel berbasis web dengan sistem role-based access control dan workflow approval. Dibangun menggunakan Laravel 12 dan Tailwind CSS, sistem ini memungkinkan user untuk membuat artikel yang harus melalui proses review admin sebelum dipublikasikan.
 
